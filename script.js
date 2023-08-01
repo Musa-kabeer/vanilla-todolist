@@ -31,14 +31,16 @@ function updateDOM() {
   domLists.innerHTML = '';
 
   // Rendering Lists on the DOM
-  lists.forEach((list, i, arr) => {
+  lists.forEach((list) => {
     const html = `
-    <li>
-      <div class="content">${list.content}</div>
-      <div id=${list.id} class="completed">2</div>
-      <div id=${list.id}  class="edit">2</div>
-      <div id=${list.id}  class="delete">2</div>
-    </li>
+     <li>
+        <div class="grid">
+          <div class="content">${list.content}</div>
+          <div id=${list.id}  class="completed">2</div>
+          <div id=${list.id}  class="edit"><i class="edit fa-solid fa-pen-to-square fa-xs"></i></div>
+          <div id=${list.id}  class="delete">2</div>
+        </div>
+     </li>
     `;
 
     domLists.insertAdjacentHTML('beforeend', html);
@@ -48,9 +50,9 @@ function updateDOM() {
 }
 
 // ON TASK COMPLETION
-document.addEventListener('click', handleCompleteTask, false);
+document.addEventListener('click', handleTask, true);
 
-function handleCompleteTask(e) {
+function handleTask(e) {
   if (e.target.className === 'completed') completeElement(e);
 
   if (e.target.className === 'edit') editElement(e);
@@ -58,18 +60,55 @@ function handleCompleteTask(e) {
   if (e.target.className === 'delete') deleteElement(e);
 }
 
+// COMPLETE TASK
 function completeElement(e) {
+  e.target.closest('.grid').firstElementChild.style.textDecoration =
+    'line-through';
+
   let item = lists.find((el) => el.id === Number(e.target.id));
 
-  item.completed = true;
+  item.completed = !item.completed;
+
+  document.querySelector('.completed').classList.add('hidden');
 }
 
+// EDIT TASK
 function editElement(e) {
-  let item = lists.find((el) => el.id === Number(e.target.id));
+  const html = `
+    <form class="editForm">
+      <input type="text" class="input editInput" placeholder="Edit your list..." />
+      <button>Edit</button>
+    </form>
+  `;
 
-  item.completed = true;
+  let currentListContent =
+    e.target.closest('.grid').firstElementChild;
+
+  e.target.closest('li').insertAdjacentHTML('beforeend', html);
+
+  // ON SUBMIT EDIT
+  document
+    .querySelector('.editForm')
+    .addEventListener('submit', function (e) {
+      e.preventDefault();
+      const editValue = document.querySelector('.editInput');
+
+      const list = lists.find(
+        (list) => list.content === currentListContent.textContent
+      );
+
+      // UPDATE UI
+      currentListContent.textContent = editValue.value;
+
+      // UPDATE ARRAY
+      list.content = editValue.value;
+
+      editValue.value = '';
+      document.querySelector('.editForm').classList.add('hidden');
+    });
 }
 
+// DELETE TASK
 function deleteElement(e) {
   // DELETE LIST FROM UI LISTS
   e.target.closest('li').className = 'hidden';
@@ -80,6 +119,4 @@ function deleteElement(e) {
   );
 
   lists.splice(index, 1);
-
-  console.log(lists);
 }
