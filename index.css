@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+  text-decoration: none;
+  outline: none;
+  list-style-type: none;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(90deg, #033703f7, #1e3b1ecd);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+}
+
+.todo {
+  background: #013e016e;
+  width: 45%;
+  height: 100vh;
+  padding: 2rem 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+form {
+  padding: 1rem 1.5rem;
+}
+
+form .input {
+  padding: 5px 12px;
+  width: 80%;
+  border-radius: 4px;
+  font-family: 'Poppins', sans-serif;
+}
+
+form button {
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #061e03a0;
+  color: #ffff;
+  font-family: 'Poppins', sans-serif;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.3s ease-in-out;
+}
+
+li {
+  display: grid;
+  grid-template-columns: 1fr 1.5rem 1.5rem 1.5rem;
+  padding: 10px 6px 10px 1.5rem;
+  gap: 4px;
+
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+li:hover {
+  background-color: #061e03a0;
+}
+
+.completed,
+.edit,
+.delete {
+  text-align: center;
+  border-radius: 50%;
+}
+
+.completed:hover,
+.edit:hover,
+.delete:hover {
+  background-color: #d7d7d75c;
+}
+
+.hidden {
+  display: none;
+}
