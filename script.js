@@ -3,7 +3,11 @@ const form = document.querySelector('form');
 const inputValue = document.querySelector('.input');
 const domLists = document.querySelector('ul');
 
-let lists = [];
+// Get items from local storage if there is item,else use empty array
+const lists = JSON.parse(localStorage.getItem('vanillaTodo')) || [];
+
+// Update dom on first rendering
+updateDOMList();
 
 // SUBMIT FORM
 form.addEventListener('submit', formHandler, true);
@@ -17,16 +21,28 @@ function formHandler(e) {
     return alert(`"${inputValue.value}" already exist!`);
   }
 
+  const charSplit = inputValue.value.split('');
+  const firstChar = charSplit[0].toUpperCase();
+  const otherChar = charSplit.slice(1);
+  const content = firstChar + otherChar.join('');
+
+  const date = new Date();
+  const createdAt = `${date.getDate()} - ${date.getMonth()} - ${date.getFullYear()} : ${date.getHours()}:${date.getMinutes()}`;
+
   lists.push({
     id: lists.length + 1,
-    content: inputValue.value,
+    content,
     completed: false,
+    createdAt,
+    color: '',
   });
 
-  updateDOM();
+  updateDOMList();
+
+  localStorage.setItem('vanillaTodo', JSON.stringify(lists));
 }
 
-function updateDOM() {
+function updateDOMList() {
   // Clean the DOM first before adding new values or else duplicate values will be preceed
   domLists.innerHTML = '';
 
@@ -35,10 +51,19 @@ function updateDOM() {
     const html = `
      <li>
         <div class="grid">
-          <div class="content">${list.content}</div>
-          <div id=${list.id}  class="completed">2</div>
-          <div id=${list.id}  class="edit"><i class="edit fa-solid fa-pen-to-square fa-xs"></i></div>
-          <div id=${list.id}  class="delete">2</div>
+          <div class="content ${
+            list.completed ? 'line' : ''
+          }" style="color: ${list.color}">${list.content}</div>
+          <div class="date">${list.createdAt}</div>
+          <div id=${
+            list.id
+          }  class="completed"><i class="fa-solid fa-pen-to-square fa-xs"></i></div>
+          <div id=${
+            list.id
+          }  class="edit"><i class="fa-solid fa-pen-to-square fa-xs"></i></div>
+          <div id=${
+            list.id
+          }  class="delete"><i class="fa-solid fa-delete-left fa-2xs"></i></div>
         </div>
      </li>
     `;
@@ -49,7 +74,7 @@ function updateDOM() {
   inputValue.value = '';
 }
 
-// ON TASK COMPLETION
+// ON TASK HANDLERS
 document.addEventListener('click', handleTask, true);
 
 function handleTask(e) {
@@ -62,18 +87,40 @@ function handleTask(e) {
 
 // COMPLETE TASK
 function completeElement(e) {
-  e.target.closest('.grid').firstElementChild.style.textDecoration =
-    'line-through';
-
   let item = lists.find((el) => el.id === Number(e.target.id));
 
   item.completed = !item.completed;
 
-  document.querySelector('.completed').classList.add('hidden');
+  const randomNum = Math.floor(Math.random() * 3 + 1);
+
+  const colors = ['', '#41ff41b9', '#d24605e7', '#069ebde7'];
+
+  item.color = colors[randomNum];
+
+  localStorage.setItem('vanillaTodo', JSON.stringify(lists));
+
+  const element = e.target.closest('.grid').firstElementChild;
+  if (item.completed === false) {
+    element.classList.remove('line');
+    element.style.color = '';
+  }
+
+  if (item.completed === true) {
+    element.classList.add('line');
+    element.style.color = colors[randomNum];
+  }
 }
 
 // EDIT TASK
 function editElement(e) {
+  console.log(lists);
+
+  if (e.target.parentElement.parentElement.children.length === 2) {
+    return e.target.parentElement.parentElement.lastElementChild.classList.toggle(
+      'hidden'
+    );
+  }
+
   const html = `
     <form class="editForm">
       <input type="text" class="input editInput" placeholder="Edit your list..." />
@@ -103,6 +150,8 @@ function editElement(e) {
       // UPDATE ARRAY
       list.content = editValue.value;
 
+      localStorage.setItem('vanillaTodo', JSON.stringify(lists));
+
       editValue.value = '';
       document.querySelector('.editForm').classList.add('hidden');
     });
@@ -119,4 +168,6 @@ function deleteElement(e) {
   );
 
   lists.splice(index, 1);
+
+  localStorage.setItem('vanillaTodo', JSON.stringify(lists));
 }
